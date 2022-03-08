@@ -1,0 +1,77 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "ADF-LOGICAPPS-PBI-DEMO"
+		},
+		"LS_ASQL_properties_typeProperties_connectionString_secretName": {
+			"type": "string",
+			"defaultValue": "AZDEV-ASQL-CONN"
+		},
+		"LS_KV_properties_typeProperties_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://AZ-KV-Powerbi2021.vault.azure.net/"
+		},
+		"dataFactory_properties_globalParameters_ENV_value": {
+			"type": "string",
+			"defaultValue": "DEV"
+		},
+		"dataFactory_location": {
+			"type": "string",
+			"defaultValue": "centralus"
+		},
+		"dataFactory_identity_type": {
+			"type": "string",
+			"defaultValue": "SystemAssigned"
+		},
+		"containerUri": {
+			"type": "string",
+			"metadata": "URI to storage account containing linked ARM templates"
+		},
+		"containerSasToken": {
+			"type": "string",
+			"metadata": "Sas token to storage account containing linked ARM templates"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "ADF-LOGICAPPS-PBI-DEMO_ArmTemplate_0",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_0.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					},
+					"dataFactory_properties_globalParameters_ENV_value": {
+						"value": "[parameters('dataFactory_properties_globalParameters_ENV_value')]"
+					},
+					"dataFactory_location": {
+						"value": "[parameters('dataFactory_location')]"
+					},
+					"dataFactory_identity_type": {
+						"value": "[parameters('dataFactory_identity_type')]"
+					},
+					"LS_KV_properties_typeProperties_baseUrl": {
+						"value": "[parameters('LS_KV_properties_typeProperties_baseUrl')]"
+					},
+					"LS_ASQL_properties_typeProperties_connectionString_secretName": {
+						"value": "[parameters('LS_ASQL_properties_typeProperties_connectionString_secretName')]"
+					}
+				}
+			},
+			"dependsOn": []
+		}
+	]
+}

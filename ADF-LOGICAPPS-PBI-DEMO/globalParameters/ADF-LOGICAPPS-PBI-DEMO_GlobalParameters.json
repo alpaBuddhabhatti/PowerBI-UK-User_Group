@@ -1,0 +1,6 @@
+{
+	"ENV": {
+		"type": "string",
+		"value": "DEV"
+	}
+}

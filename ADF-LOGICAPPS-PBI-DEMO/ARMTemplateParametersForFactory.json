@@ -1,0 +1,24 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "ADF-LOGICAPPS-PBI-DEMO"
+		},
+		"LS_ASQL_properties_typeProperties_connectionString_secretName": {
+			"value": "AZDEV-ASQL-CONN"
+		},
+		"LS_KV_properties_typeProperties_baseUrl": {
+			"value": "https://AZ-KV-Powerbi2021.vault.azure.net/"
+		},
+		"dataFactory_properties_globalParameters_ENV_value": {
+			"value": "DEV"
+		},
+		"dataFactory_location": {
+			"value": "centralus"
+		},
+		"dataFactory_identity_type": {
+			"value": "SystemAssigned"
+		}
+	}
+}

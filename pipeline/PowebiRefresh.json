@@ -1,0 +1,210 @@
+{
+	"name": "PowebiRefresh",
+	"properties": {
+		"description": "power bi data set refresh",
+		"activities": [
+			{
+				"name": "Get ClientId",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "https://az-kv-powerbi2021.vault.azure.net/secrets/ClientId?api-version=7.1",
+						"type": "Expression"
+					},
+					"method": "GET",
+					"authentication": {
+						"type": "MSI",
+						"resource": "https://vault.azure.net"
+					}
+				}
+			},
+			{
+				"name": "Get Client Secret",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "https://az-kv-powerbi2021.vault.azure.net/secrets/ClientSecret?api-version=7.1",
+						"type": "Expression"
+					},
+					"method": "GET",
+					"authentication": {
+						"type": "MSI",
+						"resource": "https://vault.azure.net"
+					}
+				}
+			},
+			{
+				"name": "Get Tenant Id",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "https://az-kv-powerbi2021.vault.azure.net/secrets/TenantId?api-version=7.1",
+						"type": "Expression"
+					},
+					"method": "GET",
+					"authentication": {
+						"type": "MSI",
+						"resource": "https://vault.azure.net"
+					}
+				}
+			},
+			{
+				"name": "Get AAD Token",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "Get ClientId",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Get Client Secret",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Get Tenant Id",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "@concat('https://login.microsoftonline.com/',activity('Get Tenant Id').output.value,'/oauth2/token')\n",
+						"type": "Expression"
+					},
+					"method": "POST",
+					"headers": {
+						"Content-Type": {
+							"value": "application/x-www-form-urlencoded",
+							"type": "Expression"
+						}
+					},
+					"body": {
+						"value": "@concat('grant_type=client_credentials&resource=https://analysis.windows.net/powerbi/api&client_id=',activity('Get ClientId').output.value,'&client_secret=',encodeUriComponent(activity('Get Client Secret').output.value))",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Refresh Power BI",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "Get AAD Token",
+						"dependencyConditions": [
+							"Skipped"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "@concat('https://api.powerbi.com/v1.0/myorg/groups/',pipeline().parameters.workspaceGuid,'/datasets/',pipeline().parameters.datasetGuid,'/refreshes')",
+						"type": "Expression"
+					},
+					"method": "POST",
+					"headers": {
+						"Authorization": {
+							"value": "@concat(string(activity('Get AAD Token').output.token_type),' ',string(activity('Get AAD Token').output.access_token))",
+							"type": "Expression"
+						}
+					},
+					"body": {
+						"value": "{\n  \"notifyOption\": \"MailOnFailure\"\n}",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Power BI Refresh -LogicApps",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "Get AAD Token",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "https://prod-30.northcentralus.logic.azure.com:443/workflows/59d0e7b33c4c447ab1b4a70783284f87/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=nYhCywnvh_TOBoaMEVu347RW7Z4DQyKMCoknPKZ1fYw",
+						"type": "Expression"
+					},
+					"method": "POST",
+					"body": []
+				}
+			}
+		],
+		"parameters": {
+			"workspaceGuid": {
+				"type": "string",
+				"defaultValue": "8cba7407-d519-4f07-8294-8a807d6ba0ec"
+			},
+			"datasetGuid": {
+				"type": "string",
+				"defaultValue": "8503eed1-3b55-4fdf-91ab-5d286e458647"
+			}
+		},
+		"folder": {
+			"name": "Extra"
+		},
+		"annotations": [],
+		"lastPublishTime": "2022-02-25T22:46:09Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

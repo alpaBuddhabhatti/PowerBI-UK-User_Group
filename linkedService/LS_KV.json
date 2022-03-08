@@ -1,0 +1,11 @@
+{
+	"name": "LS_KV",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "AzureKeyVault",
+		"typeProperties": {
+			"baseUrl": "https://AZ-KV-Powerbi2021.vault.azure.net/"
+		}
+	}
+}

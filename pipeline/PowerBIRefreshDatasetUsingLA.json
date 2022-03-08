@@ -1,0 +1,107 @@
+{
+	"name": "PowerBIRefreshDatasetUsingLA",
+	"properties": {
+		"activities": [
+			{
+				"name": "Lookup",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "select isNewUser from dbo.users where isNewUser=1",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DS_ASQL",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "Is New Data",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "Lookup",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@if(contains(string(activity('Lookup').output),'firstRow'),activity('Lookup').output.firstRow.IsNewUser,false)",
+						"type": "Expression"
+					},
+					"ifTrueActivities": [
+						{
+							"name": "Power BI Dataset - Refresh",
+							"type": "WebActivity",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"url": {
+									"value": "https://prod-30.northcentralus.logic.azure.com:443/workflows/59d0e7b33c4c447ab1b4a70783284f87/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=nYhCywnvh_TOBoaMEVu347RW7Z4DQyKMCoknPKZ1fYw",
+									"type": "Expression"
+								},
+								"method": "POST",
+								"body": []
+							}
+						},
+						{
+							"name": "Update Table",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "Power BI Dataset - Refresh",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[dbo].[UpdateIsNew]"
+							},
+							"linkedServiceName": {
+								"referenceName": "LS_ASQL",
+								"type": "LinkedServiceReference"
+							}
+						}
+					]
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2022-02-25T22:37:09Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

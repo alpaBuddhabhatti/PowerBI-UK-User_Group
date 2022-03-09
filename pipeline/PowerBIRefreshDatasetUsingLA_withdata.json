@@ -66,7 +66,10 @@
 									"type": "Expression"
 								},
 								"method": "POST",
-								"body": []
+								"body": {
+									"value": "{\n\"Username\": \"@{activity('Lookup').output.firstRow.Username}\",\n\"UserEmailId\":\"@{activity('Lookup').output.firstRow.UserEmailId}\",\n\"isNewUser\":\"@{activity('Lookup').output.firstRow.isNewUser}\"\n}",
+									"type": "Expression"
+								}
 							}
 						},
 						{

@@ -62,7 +62,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"url": {
-									"value": "https://prod-30.northcentralus.logic.azure.com:443/workflows/59d0e7b33c4c447ab1b4a70783284f87/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=nYhCywnvh_TOBoaMEVu347RW7Z4DQyKMCoknPKZ1fYw",
+									"value": "https://prod-15.northcentralus.logic.azure.com:443/workflows/a5b0aafc3f464010aa87b1c609d26db7/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=mmgQQp_3bNh90FUcoxFg7XEA6OH0_0rAUn22U3hqChE",
 									"type": "Expression"
 								},
 								"method": "POST",

@@ -14,11 +14,4 @@ Hi All,
               Download those word documents to go through it.
 
 
-2. Azure Machine Learning for Everyone (Session at SQLbits2022 at 12th March 2022 Saturday 3:30 PM)
-           For this sesssion, Please refer document as mentioned (https://github.com/alpaBuddhabhatti/PowerBI-UK-User_Group/blob/main/PowerBI-UK-Usergroup_AzureMachineLearning.pdf)
-           Dataset Download  -  https://www.kaggle.com/granjithkumar/loan-approval-data-set
-
-            https://docs.microsoft.com/en-us/learn/paths/create-machine-learn-models/
-
-            https://docs.microsoft.com/en-us/azure/machine-learning/studio-module-reference/two-class-logistic-regression
 
